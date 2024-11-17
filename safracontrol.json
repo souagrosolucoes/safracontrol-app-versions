@@ -4,11 +4,11 @@
   "sso": {
     "configs": [
       {
-        "companyId": "safracontrol",
-        "authTenantId": "safracontrol",
+        "companyId": "souagrosolucoes",
+        "authTenantId": "souagrosolucoes-nf5bn",
         "authType": "--",
         "provider": "--",
-        "providerId": "--",
+        "providerId": "oidc.microsoft",
         "domains": ["souagrosolucoes.com.br"],
         "enabled": true
       }
