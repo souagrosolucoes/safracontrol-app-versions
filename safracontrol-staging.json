@@ -1,1 +1,17 @@
-
+{
+  "version": "v1.240.0",
+  "commitHash": "fb13846cdbea22a9e80f57ea74b9e7d92595c544",
+  "sso": {
+    "configs": [
+      {
+        "companyId": "souagrosolucoes",
+        "authTenantId": "souagrosolucoes-nf5bn",
+        "authType": "--",
+        "provider": "--",
+        "providerId": "oidc.microsoft",
+        "domains": ["souagrosolucoes.com.br "],
+        "enabled": true
+      }
+    ]
+  }
+}
