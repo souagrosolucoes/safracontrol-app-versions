@@ -9,7 +9,7 @@
         "authType": "--",
         "provider": "--",
         "providerId": "oidc.microsoft",
-        "domains": ["souagrosolucoes.com.br "],
+        "domains": ["souagrosolucoes.com.br"],
         "enabled": true
       }
     ]
