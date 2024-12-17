@@ -10,7 +10,7 @@
         "provider": "--",
         "providerId": "oidc.microsoft",
         "domains": ["souagrosolucoes.com.br"],
-        "enabled": false
+        "enabled": true
       }
     ]
   }
