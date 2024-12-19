@@ -1,6 +1,6 @@
 {
-  "version": "v1.246.0",
-  "commitHash": "7432a6d8142b73dca9c17e5b943dc3b16cb6d3bb",
+  "version": "v1.246.1",
+  "commitHash": "86d3a7366fc0aaa920d7fec5aa0b8ac31f419ce9",
   "sso": {
     "configs": [
       {
