@@ -34,7 +34,6 @@
               },
               "example": {
                 "header": {
-                  "sourceId": 42,
                   "nfeKey": "35240312345678000195550010000001231234567890",
                   "dataNfe": "000123",
                   "dataIdentifierNumber": "12345678000195",
@@ -124,7 +123,6 @@
               },
               "example": {
                 "header": {
-                  "sourceId": 42,
                   "nfeKey": "35240312345678000195550010000001231234567891",
                   "dataNfe": "000123",
                   "dataDevolutionNfe": "000456",
@@ -214,7 +212,6 @@
         "type": "object",
         "description": "Cabeçalho da nota fiscal de venda. Os dados deste objeto são replicados para todos os itens inseridos.",
         "required": [
-          "sourceId",
           "dataNfe",
           "dataIdentifierNumber",
           "dataMultiplierIdentifierNumber",
@@ -224,7 +221,6 @@
           "referenceHarvest"
         ],
         "properties": {
-          "sourceId": {
             "type": "integer",
             "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
             "example": 42
@@ -382,7 +378,6 @@
         "type": "object",
         "description": "Cabeçalho da nota fiscal de devolução. Os dados deste objeto são replicados para todos os itens inseridos.",
         "required": [
-          "sourceId",
           "dataNfe",
           "dataDevolutionNfe",
           "dataIdentifierNumber",
@@ -390,7 +385,6 @@
           "referenceHarvest"
         ],
         "properties": {
-          "sourceId": {
             "type": "integer",
             "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
             "example": 42
