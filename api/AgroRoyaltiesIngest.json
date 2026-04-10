@@ -1,0 +1,518 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Agro Royalties — API de Importação de Notas Fiscais",
+    "description": "Endpoints para importação transacional de notas fiscais de venda e devolução. Cada requisição recebe o cabeçalho da nota e a lista de itens, inserindo todos em uma única transação de banco de dados.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "SouAgro"
+    }
+  },
+  "tags": [
+    {
+      "name": "Notas Fiscais de Venda",
+      "description": "Importação de notas fiscais de venda (InvoicesNotesData)"
+    },
+    {
+      "name": "Notas Fiscais de Devolução",
+      "description": "Importação de notas fiscais de devolução (DevolutionsInvoicesNotesData)"
+    }
+  ],
+  "paths": {
+    "/invoices-notes/batch": {
+      "post": {
+        "tags": ["Notas Fiscais de Venda"],
+        "summary": "Importar nota fiscal de venda com itens",
+        "description": "Recebe o cabeçalho da nota fiscal de venda e a lista de itens. Todos os itens são inseridos na tabela `invoices_notes_data` em uma única transação. Em caso de erro em qualquer item, toda a operação é revertida (rollback).",
+        "operationId": "importInvoiceNoteBatch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceNoteBatchRequest"
+              },
+              "example": {
+                "header": {
+                  "sourceId": 42,
+                  "nfeKey": "35240312345678000195550010000001231234567890",
+                  "dataNfe": "000123",
+                  "dataIdentifierNumber": "12345678000195",
+                  "dataMultiplierIdentifierNumber": "98765432000100",
+                  "dataUf": "SP",
+                  "dataCity": "Ribeirão Preto",
+                  "dataBillingDate": "2024-03-15",
+                  "referenceHarvest": "2023/2024"
+                },
+                "items": [
+                  {
+                    "dataSeedUse": "Próprio",
+                    "dataCultivate": "TMG 7062 IPRO",
+                    "dataQtyPackaging": "50",
+                    "dataTypePackaging": "SC",
+                    "dataClientName": "João da Silva Agropecuária",
+                    "dataBatch": "L2024001",
+                    "dataTechnology": "Intacta RR2 PRO",
+                    "dataWeightPackaging": "40",
+                    "dataWeightKq": "2000",
+                    "dataCfop": "5101",
+                    "dataPayerIdentifierNumber": "11122233344",
+                    "dataPms": "155",
+                    "dataQtySeeds": "250000"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Nota fiscal e itens inseridos com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos na requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Nota fiscal já importada anteriormente (hash duplicado)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno — transação revertida (rollback completo)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devolutions-invoices-notes/batch": {
+      "post": {
+        "tags": ["Notas Fiscais de Devolução"],
+        "summary": "Importar nota fiscal de devolução com itens",
+        "description": "Recebe o cabeçalho da nota fiscal de devolução e a lista de itens. Todos os itens são inseridos na tabela `devolutions_invoices_notes_data` em uma única transação. Em caso de erro em qualquer item, toda a operação é revertida (rollback).",
+        "operationId": "importDevolutionInvoiceNoteBatch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDevolutionInvoiceNoteBatchRequest"
+              },
+              "example": {
+                "header": {
+                  "sourceId": 42,
+                  "nfeKey": "35240312345678000195550010000001231234567891",
+                  "dataNfe": "000123",
+                  "dataDevolutionNfe": "000456",
+                  "dataIdentifierNumber": "12345678000195",
+                  "dataMultiplierIdentifierNumber": "98765432000100",
+                  "referenceHarvest": "2023/2024"
+                },
+                "items": [
+                  {
+                    "dataBatch": "L2024001",
+                    "dataCustomerName": "João da Silva Agropecuária",
+                    "dataQty": "10",
+                    "dataTypePackaging": "SC",
+                    "dataQtySeeds": "50000",
+                    "dataPms": "155"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Nota fiscal de devolução e itens inseridos com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos na requisição",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Nota fiscal de devolução já importada (hash duplicado)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno — transação revertida (rollback completo)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateInvoiceNoteBatchRequest": {
+        "type": "object",
+        "required": ["header", "items"],
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/InvoiceNoteHeader"
+          },
+          "items": {
+            "type": "array",
+            "description": "Lista de itens da nota fiscal. Deve conter pelo menos um item.",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/InvoiceNoteItem"
+            }
+          }
+        }
+      },
+      "InvoiceNoteHeader": {
+        "type": "object",
+        "description": "Cabeçalho da nota fiscal de venda. Os dados deste objeto são replicados para todos os itens inseridos.",
+        "required": [
+          "sourceId",
+          "dataNfe",
+          "dataIdentifierNumber",
+          "dataMultiplierIdentifierNumber",
+          "dataUf",
+          "dataCity",
+          "dataBillingDate",
+          "referenceHarvest"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "integer",
+            "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
+            "example": 42
+          },
+          "nfeKey": {
+            "type": "string",
+            "description": "Chave de acesso da NF-e (44 dígitos numéricos). Campo opcional.",
+            "example": "35240312345678000195550010000001231234567890",
+            "minLength": 44,
+            "maxLength": 44
+          },
+          "dataNfe": {
+            "type": "string",
+            "description": "Número da nota fiscal",
+            "example": "000123"
+          },
+          "dataIdentifierNumber": {
+            "type": "string",
+            "description": "CPF ou CNPJ do emitente da nota fiscal",
+            "example": "12345678000195"
+          },
+          "dataMultiplierIdentifierNumber": {
+            "type": "string",
+            "description": "CPF ou CNPJ do multiplicador",
+            "example": "98765432000100"
+          },
+          "dataUf": {
+            "type": "string",
+            "description": "UF (estado) de emissão da nota",
+            "example": "SP",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "dataCity": {
+            "type": "string",
+            "description": "Município de emissão da nota",
+            "example": "Ribeirão Preto"
+          },
+          "dataBillingDate": {
+            "type": "string",
+            "description": "Data de faturamento (formato YYYY-MM-DD ou DD/MM/YYYY)",
+            "example": "2024-03-15"
+          },
+          "referenceHarvest": {
+            "type": "string",
+            "description": "Safra de referência",
+            "example": "2023/2024"
+          }
+        }
+      },
+      "InvoiceNoteItem": {
+        "type": "object",
+        "description": "Um item da nota fiscal de venda. Cada objeto desta lista gera uma linha na tabela `invoices_notes_data`.",
+        "required": [
+          "dataSeedUse",
+          "dataCultivate",
+          "dataQtyPackaging",
+          "dataTypePackaging",
+          "dataClientName",
+          "dataBatch",
+          "dataTechnology",
+          "dataWeightPackaging",
+          "dataWeightKq",
+          "dataCfop",
+          "dataPayerIdentifierNumber",
+          "dataPms",
+          "dataQtySeeds"
+        ],
+        "properties": {
+          "dataSeedUse": {
+            "type": "string",
+            "description": "Uso da semente (ex: Próprio, Comercial)",
+            "example": "Próprio"
+          },
+          "dataCultivate": {
+            "type": "string",
+            "description": "Cultivar / variedade da semente",
+            "example": "TMG 7062 IPRO"
+          },
+          "dataQtyPackaging": {
+            "type": "string",
+            "description": "Quantidade de embalagens",
+            "example": "50"
+          },
+          "dataTypePackaging": {
+            "type": "string",
+            "description": "Tipo de embalagem (ex: SC = saco, CX = caixa)",
+            "example": "SC"
+          },
+          "dataClientName": {
+            "type": "string",
+            "description": "Nome do cliente/destinatário",
+            "example": "João da Silva Agropecuária"
+          },
+          "dataBatch": {
+            "type": "string",
+            "description": "Número do lote",
+            "example": "L2024001"
+          },
+          "dataTechnology": {
+            "type": "string",
+            "description": "Tecnologia aplicada à semente (ex: Intacta RR2 PRO)",
+            "example": "Intacta RR2 PRO"
+          },
+          "dataWeightPackaging": {
+            "type": "string",
+            "description": "Peso por embalagem em kg",
+            "example": "40"
+          },
+          "dataWeightKq": {
+            "type": "string",
+            "description": "Peso total em kg (todas as embalagens)",
+            "example": "2000"
+          },
+          "dataCfop": {
+            "type": "string",
+            "description": "Código Fiscal de Operações e Prestações (CFOP)",
+            "example": "5101"
+          },
+          "dataPayerIdentifierNumber": {
+            "type": "string",
+            "description": "CPF ou CNPJ do pagador",
+            "example": "11122233344"
+          },
+          "dataPms": {
+            "type": "string",
+            "description": "Peso Médio por Semente (PMS) em gramas",
+            "example": "155"
+          },
+          "dataQtySeeds": {
+            "type": "string",
+            "description": "Quantidade total de sementes",
+            "example": "250000"
+          }
+        }
+      },
+      "CreateDevolutionInvoiceNoteBatchRequest": {
+        "type": "object",
+        "required": ["header", "items"],
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/DevolutionInvoiceNoteHeader"
+          },
+          "items": {
+            "type": "array",
+            "description": "Lista de itens da nota fiscal de devolução. Deve conter pelo menos um item.",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/DevolutionInvoiceNoteItem"
+            }
+          }
+        }
+      },
+      "DevolutionInvoiceNoteHeader": {
+        "type": "object",
+        "description": "Cabeçalho da nota fiscal de devolução. Os dados deste objeto são replicados para todos os itens inseridos.",
+        "required": [
+          "sourceId",
+          "dataNfe",
+          "dataDevolutionNfe",
+          "dataIdentifierNumber",
+          "dataMultiplierIdentifierNumber",
+          "referenceHarvest"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "integer",
+            "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
+            "example": 42
+          },
+          "nfeKey": {
+            "type": "string",
+            "description": "Chave de acesso da NF-e de devolução (44 dígitos). Campo opcional.",
+            "example": "35240312345678000195550010000001231234567891",
+            "minLength": 44,
+            "maxLength": 44
+          },
+          "dataNfe": {
+            "type": "string",
+            "description": "Número da nota fiscal original (que está sendo devolvida)",
+            "example": "000123"
+          },
+          "dataDevolutionNfe": {
+            "type": "string",
+            "description": "Número da nota fiscal de devolução",
+            "example": "000456"
+          },
+          "dataIdentifierNumber": {
+            "type": "string",
+            "description": "CPF ou CNPJ do emitente",
+            "example": "12345678000195"
+          },
+          "dataMultiplierIdentifierNumber": {
+            "type": "string",
+            "description": "CPF ou CNPJ do multiplicador",
+            "example": "98765432000100"
+          },
+          "referenceHarvest": {
+            "type": "string",
+            "description": "Safra de referência",
+            "example": "2023/2024"
+          }
+        }
+      },
+      "DevolutionInvoiceNoteItem": {
+        "type": "object",
+        "description": "Um item da nota fiscal de devolução. Cada objeto desta lista gera uma linha na tabela `devolutions_invoices_notes_data`.",
+        "required": [
+          "dataBatch",
+          "dataCustomerName",
+          "dataQty",
+          "dataTypePackaging",
+          "dataQtySeeds",
+          "dataPms"
+        ],
+        "properties": {
+          "dataBatch": {
+            "type": "string",
+            "description": "Número do lote sendo devolvido",
+            "example": "L2024001"
+          },
+          "dataCustomerName": {
+            "type": "string",
+            "description": "Nome do cliente que realizou a devolução",
+            "example": "João da Silva Agropecuária"
+          },
+          "dataQty": {
+            "type": "string",
+            "description": "Quantidade de embalagens devolvidas",
+            "example": "10"
+          },
+          "dataTypePackaging": {
+            "type": "string",
+            "description": "Tipo de embalagem devolvida (ex: SC, CX)",
+            "example": "SC"
+          },
+          "dataQtySeeds": {
+            "type": "string",
+            "description": "Quantidade de sementes devolvidas",
+            "example": "50000"
+          },
+          "dataPms": {
+            "type": "string",
+            "description": "Peso Médio por Semente (PMS) em gramas",
+            "example": "155"
+          }
+        }
+      },
+      "BatchImportResponse": {
+        "type": "object",
+        "description": "Resposta de sucesso após importação transacional",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "insertedCount": {
+            "type": "integer",
+            "description": "Número de itens inseridos na transação",
+            "example": 3
+          },
+          "ids": {
+            "type": "array",
+            "description": "IDs (auto-increment) dos registros inseridos, na mesma ordem dos itens enviados",
+            "items": {
+              "type": "integer"
+            },
+            "example": [101, 102, 103]
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Dados inválidos na requisição"
+          },
+          "error": {
+            "type": "string",
+            "example": "Bad Request"
+          }
+        }
+      }
+    }
+  }
+}
