@@ -221,10 +221,6 @@
           "referenceHarvest"
         ],
         "properties": {
-            "type": "integer",
-            "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
-            "example": 42
-          },
           "nfeKey": {
             "type": "string",
             "description": "Chave de acesso da NF-e (44 dígitos numéricos). Campo opcional.",
@@ -385,10 +381,6 @@
           "referenceHarvest"
         ],
         "properties": {
-            "type": "integer",
-            "description": "ID da fonte/arquivo de origem (FK para tabela `source`)",
-            "example": 42
-          },
           "nfeKey": {
             "type": "string",
             "description": "Chave de acesso da NF-e de devolução (44 dígitos). Campo opcional.",
